@@ -1,0 +1,3 @@
+RESOLVED: door_status is stored in session (per-user), not in the database or shared room list.
+Two users on the same level each have their own door_status — unlocking one does NOT affect the other.
+Room-type toggle (computer open/closed) was a separate shared-state bug — fixed by storing room_type in session (see process.py).

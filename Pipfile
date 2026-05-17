@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask-sqlalchemy = "==2.5.1"
+flask-session = "*"
+flask = "*"
+werkzeug = "*"
+python-dotenv = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"

@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Home Page
+{% endblock %}
+
+{% block content %}
+<p class="username">{{username}}</p>
+<a href="/logout"><span id="logout_btn">logout</span></a>
+{% if session.get('new', False) %}
+<div class="vid">
+    <video id="myVideo">
+        <source src="static/Spaceship_Escape_Room_Intro_v1.mp4" type="video/mp4">
+    </video>
+    <button id="vid-but" onclick="document.getElementById('myVideo').play(); this.style.display='none';">CLICK to START</button>
+</div>
+{% endif %}
+<form method="POST">
+    <div class="container">
+        <div class="grid-item topleft">
+            <p id="scr">Score</p>
+            <p id="score">{{score}}</p>
+        </div>
+        <div class="grid-item level">Level {{user_level}}: {{room_data.name}}</div>
+        <div class="grid-item topright">
+            <p>▼ inventory ▼</p>
+        </div>
+        <div class="grid-item healthbar"></div>
+        <div class="grid-item main">
+            {% if rtype == "end_sequence" %}
+                <div class="vid">
+                    <video id="finaleVideo">
+                        <source src="static/finale.mp4" type="video/mp4">
+                    </video>
+                    <button id="vid-but" onclick="document.getElementById('finaleVideo').play(); this.style.display='none';">CLICK to START</button>
+                </div>
+                <div id="end-code-box" style="display:none; background:#1a0e07; color:#d4a96a; font-size:16px; padding:12px; border-radius:5px; margin-top:10px; text-align:center;">
+                    <p>{{msg}}</p>
+                    <p style="margin-top:10px;">Send an email to <strong>avanwinkel@molloyhs.org</strong> with the following code:</p>
+                    <p style="font-size:24px; font-family:monospace; color:#cd853f; margin-top:8px;"><strong>{{end_code}}</strong></p>
+                </div>
+            {% else %}
+                <p><img id="room_img" src="static/rooms/room_{{ '%02d' % user_level }}.png" onerror="this.style.display='none'"></p>
+                <p id="room_msg"> {{msg}} </p>
+            {% endif %}
+        </div>
+        <div class="grid-item inventory">
+            {% for item in inventory %}
+                <p>{{item}}</p>
+            {% endfor %}
+        </div>
+
+        <div class="grid-item bottomleft"></div>
+        <div class="grid-item commandline">
+            {% if rtype != "end_sequence" %}
+            <input id="commandline" type="text" name="command" placeholder="Enter command here">
+            {% endif %}
+        </div>
+        <div class="grid-item bottomright">
+            {% if rtype != "end_sequence" %}
+            <button id="submit" type="submit" class="btn" {% if session.get('new', False) %}style="visibility:hidden;"{% endif %}>▶ Submit</button>
+            {% endif %}
+        </div>
+
+    </div>
+</form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputField = document.getElementById("commandline");
+            if (inputField) inputField.focus();
+
+            // Intro video — reveal submit button when it ends
+            var introVideo = document.getElementById('myVideo');
+            if (introVideo) {
+                introVideo.addEventListener('ended', function() {
+                    this.style.display = 'none';
+                    var submitBtn = document.getElementById('submit');
+                    if (submitBtn) submitBtn.style.visibility = 'visible';
+                });
+            }
+
+            // Finale video — reveal code when it ends
+            var finaleVideo = document.getElementById('finaleVideo');
+            if (finaleVideo) {
+                finaleVideo.addEventListener('ended', function() {
+                    this.style.display = 'none';
+                    document.getElementById('end-code-box').style.display = 'block';
+                });
+            }
+        });
+    </script>
+
+{% endblock %}  
+

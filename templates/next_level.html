@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+login
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+    <div class="container">
+        <div class="grid-item logo hide"></div>
+        <div class="grid-item level">Next Level</div>
+        <div class="grid-item topright hide"></div>
+        <div class="grid-item healthbar hide">4</div>
+        <div class="grid-item main">
+            <p>
+                <h3 style="color: white;">Level: {{user_level}}</h3>
+                <br>
+                <button id="submit" type="submit" class="btn">▶ continue</button>
+            </p>
+        </div>
+        <div class="grid-item inventory hide"></div>
+
+        <div class="grid-item bottomleft hide">7</div>
+        <div class="grid-item commandline">
+            <span class="msg">{{msg}}</span>
+        </div>
+        <div class="grid-item bottomright hide"></div>
+
+    </div>
+</form>
+
+<script>
+    // Get a reference to the input field
+    var inputField = document.getElementById("submit");
+
+    // Set the focus to the input field
+    inputField.focus();
+</script>
+{% endblock %}  
+

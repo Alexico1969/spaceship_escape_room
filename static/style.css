@@ -1,0 +1,434 @@
+/* Reset some default browser styles */
+body, h1, p {
+    margin: 0;
+    padding: 0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+/* Make a header */
+header {
+    background: #8b4513;
+    color: white;
+    text-align: center;
+    padding: 1em;
+}
+
+/* Style the main content area */
+main {
+    margin: 2px;
+    padding: 2px;
+    background-color: #f2f2f2;
+}
+
+/* Add a footer */
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 1em;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 9fr 2fr;
+    grid-template-rows: 0.5fr 5fr 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+  
+.grid-item {
+    background-color: #7a4020;
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    border-radius: 5px;
+  }
+  
+.logo{
+    padding: 2px;
+}
+
+.level{
+    background-color: #c8864a;
+}
+
+.topright{
+    background-color: #d4a96a;
+}
+
+.healthbar{
+
+}
+
+.main{
+    background-color: #1a0e07
+}
+
+.inventory{
+    background-color: #d4a96a;
+}
+
+.bottomleft{
+
+}
+
+.commandline{
+    background-color: #3d2010;
+}
+
+.bottomright{
+    background-color: #3d2010;
+}
+
+
+.hide{
+    visibility: hidden;
+}
+
+.msg{
+    color: red;
+    font-size: 20px;
+    margin: 20px;
+    padding: 10px;
+}
+
+.dump{
+    color: white;
+    font-size: 20px;
+    margin: 5px 20px 5px 100px;
+    padding: 5px;
+    text-align: left;
+}
+
+.username{
+    /* fix to the top-left of the screen */
+    background-color: #d4a96a;
+    color: black;
+    display:block;
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    padding: 12px 5px 0px 5px;
+    text-align: center;
+    border: black 2px solid;
+    font-size: 20px;
+    width: 200px;
+    height:30px;
+}
+
+.vid {
+    display: block;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    text-align: center;
+    font-size: 20px;
+}
+
+.vid video {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+
+
+
+/*  ID's  */
+
+#submit{
+    font-size: 20px;
+    width: 200px;
+    height:50px;
+    background-color: #cd853f;
+}
+
+#register{
+    font-size: 20px;
+    width: 200px;
+    height:50px;
+    background-color: #a0522d;
+}
+
+#commandline{
+    width: 100%;
+    height: 80%;
+    font-size: 20px;
+}
+
+#username, #password, #name, #email{
+    width: 400px;
+    height:20px;
+    font-size: 20px;
+    margin: 20px;
+    padding: 10px;
+}
+
+#logout_btn{
+    font-size: 20px;
+    width: 200px;
+    height:30px;
+    background-color: #d4a96a;
+    display:block;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    padding: 12px 5px 0px 5px;
+    text-align: center;
+    border: black 2px solid;
+}
+
+#room_img{
+    height: 350px;
+    width: auto;
+    border-radius: 5px;
+}
+
+#room_msg{
+    margin-top: 10px;
+    background-color: #fdf0e0;
+    border-radius: 5px;
+    padding: 5px 10px;
+    max-height: 120px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+#computer_img{
+    
+    height: 350px;
+    width: auto;
+    border-radius: 5px;
+    display:block;
+    position: absolute;
+    top: 200px;
+    right: 54%;
+    transform: translateX(50%);
+
+}
+
+#score{
+    font-size: 18px;
+    color: white
+}
+
+#scr{
+    font-size: 14px;
+    color: yellow;
+}
+
+#vid-but{
+    /* Give the button a flashy border, make the font bigger and center the button on the screen */
+    border: 2px solid #fff;
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Make the button rounder */
+    border-radius: 5px;
+    /* Make the button a little bit transparent */
+    opacity: 0.8;
+    /* Add a small transition effect */
+    transition: 0.5s;
+    /* Make the cursor appear as a hand when you mouse over the button */
+    cursor: pointer;
+    /* Add a black background color on mouse-over */
+    background-color: black;
+    color: white;
+    padding: 10px;
+    width: 200px;
+    height: 50px;
+
+}
+
+#vid-but:hover {
+    /* Change the background color of the button on mouse-over */
+    background-color: #fff;
+    color: black;
+    opacity: 1;
+}
+
+#vid-but:active {
+    /* Add a green color when you click the button */
+    background-color: green;
+    color: white;
+}
+
+#vid-but:focus {
+    /* Remove the outline that appears on mouse-over */
+    outline: none;
+}
+
+
+/* =============================================
+   Login page
+   ============================================= */
+
+body.login-page {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #120a04;
+    background-image:
+        radial-gradient(ellipse at 15% 60%, rgba(139, 69, 19, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 20%, rgba(205, 133, 63, 0.12) 0%, transparent 50%);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
+}
+
+body.login-page header {
+    display: none;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 48px 40px 40px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+    animation: fadeInUp 0.45s ease both;
+}
+
+.login-brand {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.login-logo {
+    height: 64px;
+    width: auto;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 12px rgba(205, 133, 63, 0.5));
+}
+
+.login-title {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.login-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.field-group {
+    position: relative;
+}
+
+.field-group input {
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 16px;
+    padding: 10px 0 6px;
+    outline: none;
+    transition: border-color 0.25s;
+}
+
+.field-group input:focus {
+    border-bottom-color: #8b4513;
+}
+
+.field-group label {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+    transition: top 0.2s ease, font-size 0.2s ease, color 0.2s ease;
+}
+
+.field-group input:focus ~ label,
+.field-group input:not(:placeholder-shown) ~ label {
+    top: -14px;
+    font-size: 11px;
+    color: #8b4513;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.login-error {
+    margin: -8px 0 0;
+    font-size: 13px;
+    color: #ff6b6b;
+    text-align: center;
+}
+
+.login-btn {
+    margin-top: 8px;
+    padding: 14px;
+    width: 100%;
+    background: #8b4513;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.login-btn:hover {
+    background: #a0522d;
+    box-shadow: 0 0 24px rgba(205, 133, 63, 0.45);
+    transform: translateY(-2px);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.login-footer {
+    margin: 24px 0 0;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.login-footer a {
+    color: #8b4513;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceship Escape Room &mdash; Escaped</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-wrapper" style="max-width: 520px;">
+        <div class="login-card" style="text-align: center;">
+            <div class="login-brand">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="logo" class="login-logo">
+                <h1 class="login-title">You escaped.</h1>
+                <p class="login-subtitle">Lyra Station is behind you. The stars are ahead.</p>
+            </div>
+
+            <div style="margin: 32px 0; padding: 24px; background: rgba(139,69,19,0.08); border: 1px solid rgba(139,69,19,0.25); border-radius: 10px;">
+                <p style="color: rgba(255,255,255,0.5); font-size: 13px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 1px;">Final score</p>
+                <p style="color: #cd853f; font-size: 48px; font-weight: 700; margin: 0;">{{ score }}</p>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin: 8px 0 0;">{{ username }} &mdash; LYRA-7</p>
+            </div>
+
+            <a href="/logout" class="login-btn" style="display: block; text-decoration: none; margin-top: 0;">
+                Play again
+            </a>
+        </div>
+    </div>
+</body>
+</html>

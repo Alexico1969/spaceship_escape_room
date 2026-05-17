@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spaceship Escape Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Spaceship Escape Room</h1>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>

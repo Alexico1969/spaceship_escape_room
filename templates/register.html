@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceship Escape Room &mdash; Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-wrapper" style="max-width: 460px;">
+        <div class="login-card">
+            <div class="login-brand">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="logo" class="login-logo">
+                <h1 class="login-title">Create Account</h1>
+                <p class="login-subtitle">Join the escape room</p>
+            </div>
+
+            <form method="POST" class="login-form">
+                <div class="field-group">
+                    <input type="text" name="name" id="rg-name" placeholder=" " autocomplete="name" required>
+                    <label for="rg-name">Full Name</label>
+                </div>
+                <div class="field-group">
+                    <input type="email" name="email" id="rg-email" placeholder=" " autocomplete="email" required>
+                    <label for="rg-email">Email</label>
+                </div>
+                <div class="field-group">
+                    <input type="text" name="username" id="rg-user" placeholder=" " autocomplete="username" required>
+                    <label for="rg-user">Username</label>
+                </div>
+                <div class="field-group">
+                    <input type="password" name="password" id="rg-pass" placeholder=" " autocomplete="new-password" required>
+                    <label for="rg-pass">Password</label>
+                </div>
+
+                {% if msg %}
+                <p class="login-error">{{ msg }}</p>
+                {% endif %}
+
+                <button type="submit" class="login-btn">Register &#9654;</button>
+            </form>
+
+            <p class="login-footer">Already have an account? <a href="/login">Sign in</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('rg-name').focus();
+    </script>
+</body>
+</html>

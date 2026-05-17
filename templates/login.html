@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spaceship Escape Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-brand">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="logo" class="login-logo">
+                <h1 class="login-title">Spaceship Escape Room</h1>
+                <p class="login-subtitle">Sign in to continue</p>
+            </div>
+
+            <form method="POST" class="login-form">
+                <div class="field-group">
+                    <input type="text" name="username" id="lg-user" placeholder=" " autocomplete="username">
+                    <label for="lg-user">Username</label>
+                </div>
+                <div class="field-group">
+                    <input type="password" name="password" id="lg-pass" placeholder=" " autocomplete="current-password">
+                    <label for="lg-pass">Password</label>
+                </div>
+
+                {% if msg %}
+                <p class="login-error">{{ msg }}</p>
+                {% endif %}
+
+                <button type="submit" class="login-btn">Login &#9654;</button>
+            </form>
+
+            <p class="login-footer">No account? <a href="/register">Register here</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('lg-user').focus();
+    </script>
+</body>
+</html>

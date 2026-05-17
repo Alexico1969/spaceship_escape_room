@@ -1,0 +1,23 @@
+# Database
+database.db
+
+# Large video files (exceed GitHub's 100MB limit)
+*.mp4
+
+# Environment / secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Flask filesystem sessions
+flask_session/
+
+# Claude memory
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
