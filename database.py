@@ -408,7 +408,7 @@ def init_rooms():
         ),
         furniture="terminal,desk,door",
         objects={
-            "terminal": "<requires authorised launch key>",
+            "terminal": "<requires AUTHORIZED launch key — normal launch key not sufficient>",
             "desk":     "access card",
             "door":     "<terminal controlled>",
         },

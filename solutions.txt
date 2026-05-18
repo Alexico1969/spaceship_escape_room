@@ -1,0 +1,129 @@
+SPACESHIP ESCAPE ROOM — SOLUTIONS
+==================================
+
+LEVEL 1 — Crew Quarters (code)
+  look at desk       → PIN = locker batch, then pillow tag, then bunk number
+  look at locker     → water bottle, batch number 7
+  look at bunk       → pillow tag reads 4
+  Description says   → bunk number 2
+  Code: 7, 4, 2  →  742
+
+LEVEL 2 — Storage Corridor (inventory)
+  look at shelf      → magnetic keycard
+  take magnetic keycard
+  use magnetic keycard
+
+LEVEL 3 — Airlock Antechamber (riddle)
+  Answer: light
+
+LEVEL 4 — Maintenance Bay (code)
+  look at note       → override code = gauge readings left to right
+  look at gauges     → 3, 1, 4, 1
+  Code: 3141
+  Also: take wrench  (needed for level 5)
+
+LEVEL 5 — Coolant Control (combo)
+  take pipe section
+  combine wrench and pipe section   → fitted pipe
+  use fitted pipe
+
+LEVEL 6 — Power Relay (sequence)
+  look at diagram    → power must flow: A then C
+  switch a
+  switch c
+
+LEVEL 7 — Hydroponics Lab (code)
+  look at terminal   → C=6, H=1, N=7, O=8
+  look at note       → C then H then O then N
+  Code: 6187
+
+LEVEL 8 — Communications Array (riddle)
+  look at star chart → Neptune, a distinct star sign, Venus, Antares
+  First letters: N-O-V-A
+  Answer: nova
+
+LEVEL 9 — Captain's Quarters (combo + cipher)
+  take cipher wheel
+  take captain's log
+  use cipher wheel 13 on log        → decoded log
+  use decoded log
+
+LEVEL 10 — Security Office (riddle)
+  look at profiles   → Kai, Dex, Zara
+  look at note       → Kai and Dex have been assigned
+  Answer: zara
+
+LEVEL 11 — Reactor Anteroom (code, reversed)
+  look at legend         → Red=1, Yellow=3, Green=2, Blue=4
+  look at warning panel  → sequence: Yellow, Red, Green, Blue, Red, Yellow
+  Forward values:          3, 1, 2, 4, 1, 3
+  Reversed:                3, 1, 4, 2, 1, 3
+  Code: 314213
+
+LEVEL 12 — Reactor Core (combo + gloves)
+  open cabinet       → gloves
+  take gloves
+  take fuel rod      (gloves required — bare hands get burned)
+  take containment sleeve
+  combine fuel rod and containment sleeve   → contained fuel rod
+  use contained fuel rod
+
+LEVEL 13 — Life Support (riddle)
+  Riddle: I have seas but no water, mountains but no stone,
+          cities but no buildings.
+  Answer: map
+
+LEVEL 14 — Navigation Bay (code + observation)
+  look at charts     → count stars: Orion=8, Lyra=4, Cygnus=9
+  look at nav note   → code: Orion, Lyra, Cygnus, Σ
+  Σ = 8 + 4 + 9 = 21
+  Code: 84921
+
+LEVEL 15 — Cargo Hold (code)
+  look at classification key  → HZM = Hazardous Material
+  look at manifest            → COOL 165kg HZM | FCELL 278kg HZM
+  look at crane panel         → override = combined mass of all HZM units
+  165 + 278 = 443
+  Code: 443
+
+LEVEL 16 — Fuel Bay (code, lockout after 5 attempts)
+  look at display    → sequence: B, C, E, H, M, ?
+  Fibonacci:           2, 3, 5, 8, 13, 21
+  Letters:             B, C, E, H, M, U
+  Answer: u
+
+LEVEL 17 — Escape Pod Prep Bay (code)
+  fix locker with fitted pipe  (also accepts: wrench or multi-tool)
+  look at emergency protocol   → load heaviest first,
+                                  DOCK CODE = pack × load position
+  look at crates               → Oxygen: pack 6, 82kg
+                                  Rations: pack 4, 45kg
+                                  Medical: pack 3, 31kg
+  Heaviest first: Oxygen(pos1), Rations(pos2), Medical(pos3)
+  6×1=6, 4×2=8, 3×3=9
+  Code: 689
+  take launch key   (required before exit)
+
+LEVEL 18 — Systems Override (combo)
+  take access card
+  combine launch key and access card   → authorized key
+  use authorized key
+
+LEVEL 19 — Escape Pod Bay (retrieval)
+  look at door       → key visible in keyhole
+  take pencil        (from cabinet)
+  slide log under door
+  push pencil into keyhole   → key falls on decoded log
+  pull log           → metal key retrieved
+  use metal key      (or: open door with metal key)
+
+LEVEL 20 — Escape (end sequence)
+  Click to start the finale video.
+  When it ends, note the unique code on screen.
+  Send an email to avanwinkel@molloyhs.org with the code.
+
+==================================
+NOTE: override commands for testing:
+  **forward    go to next level
+  **back       go to previous level
+  **remove X   remove item X from inventory
