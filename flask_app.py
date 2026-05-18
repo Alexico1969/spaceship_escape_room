@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['SECRET_KEY'] = 'mysecretkey123455'
 app.config['SESSION_TYPE'] = 'filesystem'
 
 connector()
@@ -92,6 +92,7 @@ def home():
     end_code = session.get('end_code', '')
 
     if request.method == 'POST':
+        session['new'] = False
         command = request.form['command']
         if command.startswith('**'):
             msg = handle_override(command.strip())
