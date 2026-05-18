@@ -93,7 +93,7 @@ def home():
 
     if request.method == 'POST':
         session['new'] = False
-        command = request.form['command']
+        command = request.form.get('command', '')
         if command.startswith('**'):
             msg = handle_override(command.strip())
         else:

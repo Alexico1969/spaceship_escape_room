@@ -9,11 +9,11 @@ Home Page
 <a href="/logout"><span id="logout_btn">logout</span></a>
 {% if session.get('new', False) %}
 <div class="vid" id="vidContainer">
-    <button id="vid-close" onclick="document.getElementById('vidContainer').style.display='none'; document.getElementById('submit').style.visibility='visible';">✕</button>
+    <button type="button" id="vid-close" onclick="document.getElementById('vidContainer').style.display='none'; document.getElementById('submit').style.visibility='visible';">✕</button>
     <video id="myVideo">
         <source src="static/Spaceship_Escape_Room_Intro_v1.mp4" type="video/mp4">
     </video>
-    <button id="vid-but" onclick="document.getElementById('myVideo').play(); this.style.display='none';">CLICK to START</button>
+    <button type="button" id="vid-but" onclick="document.getElementById('myVideo').play(); this.style.display='none';">CLICK to START</button>
 </div>
 {% endif %}
 <form method="POST">
@@ -33,7 +33,7 @@ Home Page
                     <video id="finaleVideo">
                         <source src="static/finale.mp4" type="video/mp4">
                     </video>
-                    <button id="vid-but" onclick="document.getElementById('finaleVideo').play(); this.style.display='none';">CLICK to START</button>
+                    <button type="button" id="vid-but" onclick="document.getElementById('finaleVideo').play(); this.style.display='none';">CLICK to START</button>
                 </div>
                 <div id="end-code-box" style="display:none; background:#1a0e07; color:#d4a96a; font-size:16px; padding:12px; border-radius:5px; margin-top:10px; text-align:center;">
                     <p>{{msg}}</p>
