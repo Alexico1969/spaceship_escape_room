@@ -9,7 +9,7 @@ Home Page
 <a href="/logout"><span id="logout_btn">logout</span></a>
 {% if session.get('new', False) %}
 <div class="vid" id="vidContainer">
-    <button type="button" id="vid-close" onclick="document.getElementById('vidContainer').style.display='none'; document.getElementById('submit').style.visibility='visible';">✕</button>
+    <button type="button" id="vid-close" onclick="var v=document.getElementById('myVideo'); v.pause(); v.currentTime=0; document.getElementById('vidContainer').style.display='none'; document.getElementById('submit').style.visibility='visible';">✕</button>
     <video id="myVideo">
         <source src="static/Spaceship_Escape_Room_Intro_v1.mp4" type="video/mp4">
     </video>
