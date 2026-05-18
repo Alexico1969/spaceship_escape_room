@@ -78,7 +78,9 @@ class Room:
                  take_requirements=None,
                  use_effect="unlock", use_reveal_updates=None,
                  use_reveal_message="",
-                 max_attempts=0):
+                 max_attempts=0,
+                 door_look_msg="",
+                 required_item_alt=None):
         self.level = level
         self.name = name
         self.description = description
@@ -94,6 +96,8 @@ class Room:
         self.combo_key = combo_key              # extra keyword required to combine (e.g. "13")
         self.combo_wrong_key_msg = combo_wrong_key_msg  # shown when wrong key used
         self.take_requirements = take_requirements or {}  # {item: required_inventory_item}
+        self.door_look_msg = door_look_msg                # custom 'look door' response
+        self.required_item_alt = required_item_alt or []   # alternative items that also work
         self.use_effect = use_effect or "unlock"          # "unlock" or "reveal"
         self.use_reveal_updates = use_reveal_updates or {}  # objects to update after reveal
         self.use_reveal_message = use_reveal_message       # custom message shown after reveal
@@ -115,7 +119,7 @@ def init_rooms():
         objects={
             "bunk":   "<pillow — tag reads '4'>",
             "desk":   "<sticky note: PIN = locker batch, then pillow tag, then bunk number>",
-            "locker": "<water bottle — batch number '7'>",
+            "locker": "water bottle",
             "door":   "<keypad>",
         },
         expected_output="742",
@@ -172,7 +176,7 @@ def init_rooms():
         level=5, name="Coolant Control", type="combo",
         description=(
             "A coolant distribution room. A sealed panel blocks access to the door controls. "
-            "A pipe section lies on the floor. You carried a wrench from the maintenance bay."
+            "A pipe section lies on the floor."
         ),
         furniture="panel,pipe section,door",
         objects={
@@ -210,10 +214,10 @@ def init_rooms():
         objects={
             "plants":   "<trays labelled by element symbol: C, H, N, O>",
             "terminal": "<atomic numbers: C=6, H=1, N=7, O=8>",
-            "note":     "<growth formula code: C then H then N then O>",
+            "note":     "<growth formula code: C then H then O then N>",
             "door":     "<keypad>",
         },
-        expected_output="6178",
+        expected_output="6187",
     )
 
     rooms[8] = Room(
@@ -224,7 +228,7 @@ def init_rooms():
         ),
         furniture="console,star chart,door",
         objects={
-            "star chart": "<a chart of the night sky — some stars appear to be marked>",
+            "star chart": "<The star chart shows: Neptune, a distinct star sign, Venus and Antares>",
             "console":    "<speak the name they spell>",
             "door":       "<voice panel>",
         },
@@ -264,6 +268,7 @@ def init_rooms():
             "door":     "<keypad: enter the name of the remaining officer>",
         },
         expected_output="zara",
+        door_look_msg="The door is sealed. There is a keyboard. The screen says: 'Who is not assigned?'",
     )
 
     rooms[11] = Room(
@@ -271,7 +276,7 @@ def init_rooms():
         description=(
             "Warning lights cycle on a panel mounted to the wall. "
             "A legend below explains each colour's value. "
-            "The door panel reads: ENTER SEQUENCE IN REVERSE."
+            "The door panel reads: EXAMINE SCREEN MESSAGE!"
         ),
         furniture="warning panel,legend,door",
         objects={
@@ -384,6 +389,7 @@ def init_rooms():
         },
         expected_output="689",
         required_item="fitted pipe",
+        required_item_alt=["multi-tool", "wrench"],
         use_effect="reveal",
         use_reveal_updates={
             "locker":             "launch key",

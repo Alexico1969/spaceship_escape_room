@@ -3,6 +3,7 @@ from flask import session
 import re
 
 ITEM_DESCRIPTIONS = {
+    "water bottle":     "Your crew water bottle. Dented from years of use. The batch number stamped on the bottom reads: 7.",
     "magnetic keycard": "A standard-issue magnetic keycard. Stamped 'ZONE 3 ACCESS'. There's a coffee stain on the back and someone has drawn a smiley face in marker.",
     "wrench":           "A heavy-duty wrench, slightly rusty. Someone has scratched the initials 'K.D.' into the handle. You wonder who K.D. was.",
     "pipe section":     "A short steel pipe, about 30cm long. Cold to the touch. Smells faintly of coolant.",
@@ -13,7 +14,7 @@ ITEM_DESCRIPTIONS = {
     "fuel rod":           "A reactor fuel rod pulsing with dangerous energy. Extremely hot — do not touch with bare hands.",
     "containment sleeve": "A heat-resistant sleeve for handling fuel rods. Rated to 1400°C. The label says 'DO NOT MICROWAVE'.",
     "gloves":             "Heavy-duty heat-resistant gloves. Rated for reactor work. These will protect your hands.",
-    "multi-tool":         "A multi-tool. Three of its attachments are missing. Completely useless in its current state.",
+    "multi-tool":         "A multi-tool. Three of its attachments are missing — but the coupling driver still works.",
     "contained fuel rod": "A fuel rod safely inside its containment sleeve. Ready to insert. Still slightly terrifying.",
     "electromagnet":    "A chunky electromagnet, dead without power. Someone has taped a sticky note to it that reads 'DO NOT USE ON WATCHES'.",
     "power cable":      "A thick two-metre power cable. Slightly frayed at one end. Probably fine.",
@@ -40,9 +41,19 @@ def process(inp, inventory, room_data, level, objects):
 
     try:
         # ── EXIT ────────────────────────────────────────────────────────────
-        if inp in ("exit", "exit room", "leave", "leave room", "open door"):
+        if inp in ("exit", "exit room", "leave", "leave room", "open door") or inp.startswith("open door"):
             if door_status == "locked":
-                return "The door is sealed."
+                # If player mentions the required item, use it automatically
+                req = room_data.required_item.lower()
+                if req:
+                    req_words = req.split()
+                    inv = session['inventory']
+                    found_req = next((i for i in inv if all(w in i.lower().split() for w in req_words)), None)
+                    if found_req and any(w in inp for w in req_words):
+                        session['door_status'] = "unlocked"
+                        door_status = "unlocked"
+                if door_status == "locked":
+                    return "The door is sealed."
             inv = session['inventory']
             missing = [item for item in room_data.must_take if item not in inv]
             if missing:
@@ -78,6 +89,8 @@ def process(inp, inventory, room_data, level, objects):
             if "door" in thing or "keypad" in thing:
                 if door_status != "locked":
                     return "The door is open."
+                if room_data.door_look_msg:
+                    return room_data.door_look_msg
                 if current_type == "code":
                     return "The door is sealed. A numeric keypad is mounted beside it. Type the correct code to unlock."
                 if current_type == "riddle":
@@ -266,6 +279,13 @@ def process(inp, inventory, room_data, level, objects):
         # ── OPEN <thing> ─────────────────────────────────────────────────────
         if inp.startswith("open "):
             target = inp[5:].strip().replace(" ", "")
+            # Door always goes through the standard door check
+            if "door" in target:
+                if door_status == "locked":
+                    if "card" in inp or "key" in inp:
+                        return "Use the right card."
+                    return "The door is sealed."
+                return "You exit the room."
             for key, val in objects.items():
                 if target in key.replace(" ", "").lower() or key.replace(" ", "").lower() in target:
                     if not val:
@@ -295,7 +315,12 @@ def process(inp, inventory, room_data, level, objects):
                 return f"You don't have a {item}."
             req = room_data.required_item.lower()
             req_words = req.split()
-            if req and any(w in found.lower() for w in req_words):
+            primary_match = req and all(w in found.lower().split() for w in req_words)
+            alt_match = any(
+                all(w in found.lower().split() for w in alt.lower().split())
+                for alt in room_data.required_item_alt
+            )
+            if primary_match or alt_match:
                 if room_data.use_effect == "reveal":
                     _, sc, lv, inv2, obj2, _ = get()
                     obj2.update(room_data.use_reveal_updates)
