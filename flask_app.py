@@ -196,18 +196,42 @@ def logout():
     return redirect(url_for('login'))
 
 
-# ── Admin dump ────────────────────────────────────────────────────────────────
+# ── Admin dashboard ───────────────────────────────────────────────────────────
 
-@app.route('/dump1')
-def dump1():
+@app.route('/admin')
+def admin():
     if 'user' not in session or session['user'] != 'admin':
         return redirect(url_for('home'))
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM users")
-    data = c.fetchall()
+    c.execute("SELECT name, email, username, level, score, inventory FROM users WHERE username != 'admin' ORDER BY level DESC, score DESC")
+    rows = c.fetchall()
     conn.close()
-    return render_template('dump.html', lines=data)
+
+    players = []
+    level_counts = [0] * 21
+    for row in rows:
+        name, email, username, level, score, inventory = row
+        items = [i for i in inventory.split(',') if i] if inventory else []
+        players.append({
+            'name':      name,
+            'email':     email,
+            'username':  username,
+            'level':     level,
+            'room_name': rooms[level].name if level <= 20 else 'Done',
+            'score':     score,
+            'inventory': items,
+        })
+        if level <= 20:
+            level_counts[level] += 1
+
+    stats = {
+        'total':     len(players),
+        'avg_level': round(sum(p['level'] for p in players) / len(players), 1) if players else 0,
+        'finished':  sum(1 for p in players if p['level'] == 20),
+        'level_counts': level_counts,
+    }
+    return render_template('admin.html', players=players, stats=stats, rooms=rooms)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
