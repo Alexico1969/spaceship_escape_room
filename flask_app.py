@@ -41,21 +41,6 @@ def handle_override(command):
         update_user(username, inventory, new_level, score)
         return f"[OVERRIDE] Level {new_level}: {rooms[new_level].name}"
 
-    if command == '**forward':
-        new_level = min(20, level + 1)
-        session['level']         = new_level
-        session['objects']       = dict(rooms[new_level].objects)
-        session['room_type']     = rooms[new_level].type
-        session['door_status']   = 'locked'
-        session['sequence_step'] = 0
-        session['wrong_attempts'] = 0
-        session['log_slid']      = False
-        session['key_on_log']    = False
-        session['key_lost']      = False
-        store(username, score, new_level, inventory, dict(rooms[new_level].objects))
-        update_user(username, inventory, new_level, score)
-        return f"[OVERRIDE] Level {new_level}: {rooms[new_level].name}"
-
     if command.startswith('**remove '):
         item_name = command[9:].strip().lower()
         found = next((i for i in inventory if item_name in i.lower()), None)

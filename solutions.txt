@@ -124,6 +124,5 @@ LEVEL 20 — Escape (end sequence)
 
 ==================================
 NOTE: override commands for testing:
-  **forward    go to next level
   **back       go to previous level
   **remove X   remove item X from inventory
