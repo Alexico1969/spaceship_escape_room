@@ -114,6 +114,10 @@ def next_level():
     score = session['score']
 
     if request.method == 'POST':
+        expected = int(request.form.get('current_level', -1))
+        if session['level'] != expected:
+            # Duplicate submission (back button) — already advanced
+            return redirect(url_for('home'))
         level += 1
         score += 100
         objects = rooms[level].objects
@@ -232,6 +236,30 @@ def admin():
         'level_counts': level_counts,
     }
     return render_template('admin.html', players=players, stats=stats, rooms=rooms)
+
+
+@app.route('/admin/delete/<username>', methods=['POST'])
+def admin_delete(username):
+    if 'user' not in session or session['user'] != 'admin':
+        return redirect(url_for('home'))
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("DELETE FROM users WHERE username = ?", (username,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/reset/<username>', methods=['POST'])
+def admin_reset(username):
+    if 'user' not in session or session['user'] != 'admin':
+        return redirect(url_for('home'))
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("UPDATE users SET level=1, score=100, inventory='' WHERE username=?", (username,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
 
 
 # ─────────────────────────────────────────────────────────────────────────────

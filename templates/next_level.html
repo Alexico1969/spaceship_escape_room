@@ -6,6 +6,7 @@ login
 
 {% block content %}
 <form method="POST">
+    <input type="hidden" name="current_level" value="{{ user_level - 1 }}">
     <div class="container">
         <div class="grid-item logo hide"></div>
         <div class="grid-item level">Next Level</div>

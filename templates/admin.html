@@ -178,6 +178,29 @@
             padding: 48px;
             color: rgba(212,169,106,0.4);
         }
+
+        .btn-action {
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            margin-right: 4px;
+        }
+        .btn-reset {
+            background: rgba(80,179,162,0.2);
+            color: #50b3a2;
+            border: 1px solid rgba(80,179,162,0.4);
+        }
+        .btn-reset:hover { background: rgba(80,179,162,0.35); }
+        .btn-del {
+            background: rgba(220,60,60,0.15);
+            color: #e07070;
+            border: 1px solid rgba(220,60,60,0.35);
+        }
+        .btn-del:hover { background: rgba(220,60,60,0.3); }
     </style>
 </head>
 <body>
@@ -237,6 +260,7 @@
                         <th>Level</th>
                         <th>Score</th>
                         <th>Inventory</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -265,6 +289,14 @@
                             {% else %}
                                 <span class="empty">empty</span>
                             {% endif %}
+                        </td>
+                        <td style="white-space:nowrap;">
+                            <form method="POST" action="/admin/reset/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Reset {{ p.username }} to level 1?')">
+                                <button type="submit" class="btn-action btn-reset">RESET</button>
+                            </form>
+                            <form method="POST" action="/admin/delete/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Delete {{ p.username }}? This cannot be undone.')">
+                                <button type="submit" class="btn-action btn-del">DEL</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
