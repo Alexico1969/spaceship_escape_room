@@ -69,15 +69,13 @@ def process(inp, inventory, room_data, level, objects):
             hints = room_data.hints
             if not hints:
                 return "No hints available for this room."
-            idx = session.get('hint_index', 0)
-            hint = hints[min(idx, len(hints) - 1)]
-            session['hint_index'] = min(idx + 1, len(hints) - 1)
-            # Deduct 5 extra points for using a hint
+            if session.get('hint_index', 0) >= 1:
+                return "You have already used your one hint for this level."
+            hint = hints[0]
+            session['hint_index'] = 1
             session['score'] = max(0, session['score'] - 5)
             update_user(username, inventory, level, session['score'])
-            remaining = len(hints) - idx - 1
-            suffix = f" ({remaining} more hint{'s' if remaining != 1 else ''} available)" if remaining > 0 else " (no more hints)"
-            return f"HINT: {hint}{suffix}"
+            return f"HINT (-5pts): {hint}"
 
         # ── HELP ─────────────────────────────────────────────────────────────
         if inp == "help":
