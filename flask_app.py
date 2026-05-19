@@ -34,6 +34,7 @@ def handle_override(command):
         session['door_status']   = 'locked'
         session['sequence_step'] = 0
         session['wrong_attempts'] = 0
+        session['hint_index']    = 0
         session['log_slid']      = False
         session['key_on_log']    = False
         session['key_lost']      = False
@@ -87,6 +88,9 @@ def home():
             f"{username.upper()[:6]}-{now.strftime('%d%m')}-{now.strftime('%H%M')}-{rand}"
         )
     end_code = session.get('end_code', '')
+    grade = None
+    if level == 20:
+        grade = 'A' if score >= 1600 else 'B' if score >= 1200 else 'C' if score >= 800 else 'D' if score >= 400 else 'F'
 
     if request.method == 'POST':
         session['new'] = False
@@ -109,7 +113,7 @@ def home():
         'home.html',
         msg=msg, inventory=inventory, user_level=level,
         room_data=room_data, username=username, rtype=rtype, score=score,
-        end_code=end_code, admin_msg=admin_msg
+        end_code=end_code, admin_msg=admin_msg, grade=grade
     )
 
 
@@ -139,6 +143,7 @@ def next_level():
         session['door_status'] = "locked"
         session['sequence_step'] = 0
         session['wrong_attempts'] = 0
+        session['hint_index']    = 0
         session['log_slid']      = False
         session['key_on_log']    = False
         session['key_lost']      = False
@@ -156,6 +161,17 @@ def win():
     username = session['user']
     score = session['score']
     return render_template('win.html', username=username, score=score)
+
+
+@app.route('/leaderboard')
+def leaderboard():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT username, level, score FROM users WHERE username != 'admin' ORDER BY level DESC, score DESC LIMIT 20")
+    rows = c.fetchall()
+    conn.close()
+    current = session.get('user', '')
+    return render_template('leaderboard.html', rows=rows, current=current)
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard — Spaceship Escape Room</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .lb-wrap { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        h2 { text-align: center; color: #fdf0e0; font-size: 22px; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        thead th { color: rgba(212,169,106,0.6); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; border-bottom: 1px solid rgba(205,133,63,0.2); }
+        tbody tr { border-bottom: 1px solid rgba(205,133,63,0.08); transition: background 0.15s; }
+        tbody tr:hover { background: rgba(205,133,63,0.06); }
+        tbody tr.me { background: rgba(205,133,63,0.12); }
+        tbody td { padding: 10px 12px; color: #d4a96a; }
+        .rank { font-weight: 700; color: rgba(212,169,106,0.4); width: 40px; }
+        .rank-1 { color: gold; font-size: 18px; }
+        .rank-2 { color: silver; font-size: 16px; }
+        .rank-3 { color: #cd853f; font-size: 15px; }
+        .uname { font-weight: 700; color: #fdf0e0; }
+        .score-col { font-weight: 700; text-align: right; }
+        .level-col { text-align: center; }
+        .back-link { display: block; text-align: center; margin-top: 24px; color: #cd853f; text-decoration: none; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+        .trophy { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <header><h1>Spaceship Escape Room</h1></header>
+    <main>
+        <div class="lb-wrap">
+            <h2>&#127942; Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Player</th>
+                        <th class="level-col">Level</th>
+                        <th style="text-align:right;">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr class="{{ 'me' if row[0] == current else '' }}">
+                        <td class="rank rank-{{ loop.index if loop.index <= 3 else '' }}">
+                            {% if loop.index == 1 %}&#129351;
+                            {% elif loop.index == 2 %}&#129352;
+                            {% elif loop.index == 3 %}&#129353;
+                            {% else %}{{ loop.index }}{% endif %}
+                        </td>
+                        <td class="uname">{{ row[0] }}{% if row[0] == current %} <span style="font-size:11px;color:#cd853f;">(you)</span>{% endif %}</td>
+                        <td class="level-col">{{ row[1] }}/20</td>
+                        <td class="score-col">{{ row[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="/" class="back-link">&#8592; Back to game</a>
+        </div>
+    </main>
+</body>
+</html>

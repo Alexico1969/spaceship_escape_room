@@ -1,12 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %}
-Home Page
-{% endblock %}
+{% block title %}Home Page{% endblock %}
 
 {% block content %}
 <p class="username">{{username}}</p>
 <a href="/logout"><span id="logout_btn">logout</span></a>
+
 {% if admin_msg %}
 <div id="admin-banner">
     <span>&#128276; Message from your teacher: <strong>{{ admin_msg }}</strong></span>
@@ -23,15 +22,24 @@ Home Page
     <button type="button" id="vid-but" onclick="document.getElementById('myVideo').play(); this.style.display='none';">CLICK to START</button>
 </div>
 {% endif %}
-<form method="POST">
+
+<!-- Progress bar -->
+{% if rtype != "end_sequence" %}
+<div id="level-progress">
+    <div id="level-progress-fill" style="width:{{ ((user_level - 1) / 19 * 100) | int }}%"></div>
+    <span id="level-progress-label">Level {{user_level}} / 20</span>
+</div>
+{% endif %}
+
+<form method="POST" id="gameForm">
     <div class="container">
         <div class="grid-item topleft">
             <p id="scr">Score</p>
             <p id="score">{{score}}</p>
         </div>
-        <div class="grid-item level">Level {{user_level}}: {{room_data.name}}</div>
+        <div class="grid-item level">{{room_data.name}}</div>
         <div class="grid-item topright">
-            <p>▼ inventory ▼</p>
+            <p>&#9660; inventory &#9660;</p>
         </div>
         <div class="grid-item healthbar"></div>
         <div class="grid-item main">
@@ -46,58 +54,158 @@ Home Page
                     <p>{{msg}}</p>
                     <p style="margin-top:10px;">Send an email to <strong>avanwinkel@molloyhs.org</strong> with the following code:</p>
                     <p style="font-size:24px; font-family:monospace; color:#cd853f; margin-top:8px;"><strong>{{end_code}}</strong></p>
+                    {% if grade %}
+                    <p style="margin-top:16px; font-size:14px; color:rgba(212,169,106,0.6);">Your efficiency rating:</p>
+                    <p style="font-size:56px; font-weight:700; color:{% if grade=='A' %}gold{% elif grade=='B' %}#50b3a2{% elif grade=='C' %}#cd853f{% else %}#e07070{% endif %};">{{grade}}</p>
+                    <p style="font-size:12px; color:rgba(212,169,106,0.4);">(based on score across all 20 levels)</p>
+                    {% endif %}
+                    <p style="margin-top:16px;"><a href="/leaderboard" style="color:#cd853f;">View leaderboard &#8594;</a></p>
                 </div>
             {% else %}
-                <p><img id="room_img" src="static/rooms/room_{{ '%02d' % user_level }}.png" onerror="this.style.display='none'"></p>
-                <p id="room_msg"> {{msg}} </p>
+                <!-- Room image with zoom on click -->
+                <p><img id="room_img" src="static/rooms/room_{{ '%02d' % user_level }}.png"
+                        onerror="this.style.display='none'"
+                        onclick="openZoom(this.src)" style="cursor:zoom-in;"></p>
+                <p id="room_msg" class="{% if 'HINT:' in msg %}hint-msg{% endif %}">{{msg}}</p>
             {% endif %}
         </div>
         <div class="grid-item inventory">
             {% for item in inventory %}
-                <p>{{item}}</p>
+                <p class="inv-item">{{item}}</p>
             {% endfor %}
         </div>
 
-        <div class="grid-item bottomleft"></div>
+        <div class="grid-item bottomleft" id="status-bar">
+            {% if rtype != "end_sequence" %}
+            <span id="door-indicator" class="door-{% if session.get('door_status') == 'unlocked' %}open{% else %}locked{% endif %}">
+                &#128274; {% if session.get('door_status') == 'unlocked' %}OPEN{% else %}SEALED{% endif %}
+            </span>
+            {% endif %}
+        </div>
         <div class="grid-item commandline">
             {% if rtype != "end_sequence" %}
-            <input id="commandline" type="text" name="command" placeholder="Enter command here">
+            <input id="commandline" type="text" name="command" placeholder="type a command… (hint for help)">
             {% endif %}
         </div>
         <div class="grid-item bottomright">
             {% if rtype != "end_sequence" %}
-            <button id="submit" type="submit" class="btn" {% if session.get('new', False) %}style="visibility:hidden;"{% endif %}>▶ Submit</button>
+            <button id="submit" type="submit" class="btn" {% if session.get('new', False) %}style="visibility:hidden;"{% endif %}>&#9654; Submit</button>
             {% endif %}
         </div>
-
     </div>
+
+    <!-- Command chips -->
+    {% if rtype != "end_sequence" %}
+    <div id="cmd-chips">
+        <button type="button" class="chip" onclick="sendCmd('look around')">look around</button>
+        <button type="button" class="chip" onclick="sendCmd('look at door')">look at door</button>
+        <button type="button" class="chip" onclick="sendCmd('inventory')">inventory</button>
+        <button type="button" class="chip" onclick="sendCmd('hint')">hint (-5pts)</button>
+        <button type="button" class="chip" onclick="sendCmd('help')">help</button>
+        {% if session.get('door_status') == 'unlocked' %}
+        <button type="button" class="chip chip-exit" onclick="sendCmd('exit')">exit room &#10132;</button>
+        {% endif %}
+    </div>
+    {% endif %}
 </form>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var inputField = document.getElementById("commandline");
-            if (inputField) inputField.focus();
+<!-- Image zoom overlay -->
+<div id="zoom-overlay" onclick="closeZoom()">
+    <img id="zoom-img" src="" alt="">
+    <button type="button" id="zoom-close" onclick="closeZoom()">✕</button>
+</div>
 
-            // Intro video — reveal submit button when it ends
-            var introVideo = document.getElementById('myVideo');
-            if (introVideo) {
-                introVideo.addEventListener('ended', function() {
-                    this.style.display = 'none';
-                    var submitBtn = document.getElementById('submit');
-                    if (submitBtn) submitBtn.style.visibility = 'visible';
-                });
-            }
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('commandline');
+    if (input) input.focus();
 
-            // Finale video — reveal code when it ends
-            var finaleVideo = document.getElementById('finaleVideo');
-            if (finaleVideo) {
-                finaleVideo.addEventListener('ended', function() {
-                    this.style.display = 'none';
-                    document.getElementById('end-code-box').style.display = 'block';
-                });
+    // ── Intro video ──
+    var introVideo = document.getElementById('myVideo');
+    if (introVideo) {
+        introVideo.addEventListener('ended', function() {
+            this.style.display = 'none';
+            var btn = document.getElementById('submit');
+            if (btn) btn.style.visibility = 'visible';
+        });
+    }
+
+    // ── Finale video ──
+    var finaleVideo = document.getElementById('finaleVideo');
+    if (finaleVideo) {
+        finaleVideo.addEventListener('ended', function() {
+            this.style.display = 'none';
+            document.getElementById('end-code-box').style.display = 'block';
+        });
+    }
+
+    // ── Up-arrow command history ──
+    var history = [], histIdx = -1;
+    if (input) {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (histIdx < history.length - 1) { histIdx++; input.value = history[histIdx]; }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (histIdx > 0) { histIdx--; input.value = history[histIdx]; }
+                else { histIdx = -1; input.value = ''; }
             }
         });
-    </script>
+        document.getElementById('gameForm').addEventListener('submit', function() {
+            if (input.value.trim()) { history.unshift(input.value.trim()); histIdx = -1; }
+        });
+    }
 
-{% endblock %}  
+    // ── Door unlock flash ──
+    var msg = document.getElementById('room_msg');
+    if (msg) {
+        var text = msg.innerText.toLowerCase();
+        if (text.includes('unseals') || text.includes('unlocks') || text.includes('slides open') || text.includes('pops open')) {
+            msg.classList.add('flash-green');
+            setTimeout(function() { msg.classList.remove('flash-green'); }, 1500);
+        }
+    }
 
+    // ── Ambient idle messages ──
+    var ambientMsgs = [
+        "The ship groans softly. Something distant echoes through the hull.",
+        "A distant alarm pulses somewhere deep in the station.",
+        "The air recyclers hum. You're running out of time.",
+        "Your suit sensors show life support at 34%. Keep moving.",
+        "Static crackles over the intercom. Then silence.",
+        "The lights flicker. Emergency power is holding — for now."
+    ];
+    var ambientTimer;
+    function scheduleAmbient() {
+        ambientTimer = setTimeout(function() {
+            var m = document.getElementById('room_msg');
+            if (m && !document.getElementById('myVideo') && document.getElementById('commandline')) {
+                var old = m.innerHTML;
+                m.innerHTML = '<em style="color:#7a4020;">' + ambientMsgs[Math.floor(Math.random() * ambientMsgs.length)] + '</em>';
+                setTimeout(function() { m.innerHTML = old; }, 4000);
+            }
+            scheduleAmbient();
+        }, 35000);
+    }
+    if (document.getElementById('commandline')) scheduleAmbient();
+    document.addEventListener('keydown', function() { clearTimeout(ambientTimer); scheduleAmbient(); });
+});
+
+// ── Send command via chips ──
+function sendCmd(cmd) {
+    var input = document.getElementById('commandline');
+    if (input) { input.value = cmd; document.getElementById('gameForm').submit(); }
+}
+
+// ── Image zoom ──
+function openZoom(src) {
+    document.getElementById('zoom-img').src = src;
+    document.getElementById('zoom-overlay').style.display = 'flex';
+}
+function closeZoom() {
+    document.getElementById('zoom-overlay').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeZoom(); });
+</script>
+{% endblock %}

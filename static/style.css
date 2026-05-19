@@ -283,6 +283,91 @@ footer {
 }
 
 
+/* ── Progress bar ── */
+#level-progress {
+    position: relative;
+    height: 6px;
+    background: rgba(122,64,32,0.3);
+    margin: 0 10px 4px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+#level-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b4513, #cd853f);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+#level-progress-label {
+    position: absolute;
+    right: 6px;
+    top: -14px;
+    font-size: 10px;
+    color: rgba(212,169,106,0.5);
+}
+
+/* ── Door status indicator ── */
+#status-bar { display: flex; align-items: center; justify-content: center; }
+#door-indicator { font-size: 12px; padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+#door-indicator.door-locked  { background: rgba(220,60,60,0.15); color: #e07070; border: 1px solid rgba(220,60,60,0.3); }
+#door-indicator.door-open    { background: rgba(80,179,162,0.15); color: #50b3a2; border: 1px solid rgba(80,179,162,0.3); }
+
+/* ── Hint message style ── */
+.hint-msg { color: #cd853f !important; font-style: italic; border-left: 3px solid #cd853f; padding-left: 8px !important; }
+
+/* ── Door unlock flash ── */
+@keyframes flashGreen {
+    0%   { background-color: rgba(80,179,162,0.3); }
+    100% { background-color: #fdf0e0; }
+}
+.flash-green { animation: flashGreen 1.5s ease; }
+
+/* ── Command chips ── */
+#cmd-chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 8px 10px 0;
+}
+.chip {
+    background: rgba(122,64,32,0.3); border: 1px solid rgba(205,133,63,0.3);
+    color: #d4a96a; border-radius: 20px; padding: 4px 12px;
+    font-size: 12px; cursor: pointer; transition: background 0.2s;
+}
+.chip:hover { background: rgba(205,133,63,0.25); }
+.chip-exit { background: rgba(80,179,162,0.15); border-color: rgba(80,179,162,0.35); color: #50b3a2; }
+.chip-exit:hover { background: rgba(80,179,162,0.28); }
+
+/* ── Image zoom overlay ── */
+#zoom-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88); z-index: 9999;
+    align-items: center; justify-content: center;
+    cursor: zoom-out;
+}
+#zoom-overlay img { max-width: 92vw; max-height: 88vh; border-radius: 8px; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+#zoom-close {
+    position: fixed; top: 20px; right: 28px;
+    background: #cd853f; color: white; border: none;
+    border-radius: 50%; width: 36px; height: 36px;
+    font-size: 18px; cursor: pointer; z-index: 10000;
+}
+
+/* ── Inventory items ── */
+.inv-item { font-size: 13px; padding: 2px 0; }
+
+/* ── Responsive (tablet / mobile) ── */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+    .grid-item.healthbar, .grid-item.bottomleft { display: none; }
+    #room_img { width: 100%; height: auto; }
+    #room_msg { max-height: 200px; }
+    .username, #logout_btn { font-size: 14px; width: auto; }
+    #cmd-chips { padding: 6px; }
+    .chip { font-size: 11px; padding: 3px 10px; }
+}
+
 /* Admin message banner */
 #admin-banner {
     position: fixed;

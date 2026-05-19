@@ -33,6 +33,10 @@ def process(inp, inventory, room_data, level, objects):
 
     inp = inp.lower().strip()
     inp = inp.replace('cypher', 'cipher')   # normalise spelling variant
+    # Single-letter shortcuts
+    shortcuts = {'l': 'look around', 'i': 'inventory', 'e': 'exit', 'h': 'hint'}
+    if inp in shortcuts:
+        inp = shortcuts[inp]
     original_inp = inp  # preserve before article stripping (needed for switch 'a')
     inp = inp.replace(' the ', ' ').replace(' a ', ' ').replace(' an ', ' ').strip()
 
@@ -59,6 +63,21 @@ def process(inp, inventory, room_data, level, objects):
             if missing:
                 return f"You should take the {missing[0]} before leaving."
             return "You exit the room."
+
+        # ── HINT ─────────────────────────────────────────────────────────────
+        if inp == "hint":
+            hints = room_data.hints
+            if not hints:
+                return "No hints available for this room."
+            idx = session.get('hint_index', 0)
+            hint = hints[min(idx, len(hints) - 1)]
+            session['hint_index'] = min(idx + 1, len(hints) - 1)
+            # Deduct 5 extra points for using a hint
+            session['score'] = max(0, session['score'] - 5)
+            update_user(username, inventory, level, session['score'])
+            remaining = len(hints) - idx - 1
+            suffix = f" ({remaining} more hint{'s' if remaining != 1 else ''} available)" if remaining > 0 else " (no more hints)"
+            return f"HINT: {hint}{suffix}"
 
         # ── HELP ─────────────────────────────────────────────────────────────
         if inp == "help":
