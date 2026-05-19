@@ -7,6 +7,13 @@ Home Page
 {% block content %}
 <p class="username">{{username}}</p>
 <a href="/logout"><span id="logout_btn">logout</span></a>
+{% if admin_msg %}
+<div id="admin-banner">
+    <span>&#128276; Message from your teacher: <strong>{{ admin_msg }}</strong></span>
+    <button type="button" onclick="this.parentElement.style.display='none';">✕</button>
+</div>
+{% endif %}
+
 {% if session.get('new', False) %}
 <div class="vid" id="vidContainer">
     <button type="button" id="vid-close" onclick="var v=document.getElementById('myVideo'); v.pause(); v.currentTime=0; document.getElementById('vidContainer').style.display='none'; document.getElementById('submit').style.visibility='visible';">✕</button>

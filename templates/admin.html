@@ -6,307 +6,328 @@
     <title>Admin Dashboard — Spaceship Escape Room</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Trebuchet MS', Arial, sans-serif;
-            background: #120a04;
-            color: #d4a96a;
-            min-height: 100vh;
-        }
+        body { font-family: 'Trebuchet MS', Arial, sans-serif; background: #120a04; color: #d4a96a; min-height: 100vh; }
 
         header {
-            background: #6b3a2a;
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #6b3a2a; padding: 16px 32px;
+            display: flex; justify-content: space-between; align-items: center;
             border-bottom: 2px solid #cd853f;
         }
         header h1 { color: #fdf0e0; font-size: 22px; }
-        header a { color: #cd853f; text-decoration: none; font-size: 14px; }
-        header a:hover { text-decoration: underline; }
+        header .nav a { color: #cd853f; text-decoration: none; font-size: 14px; margin-left: 20px; }
+        header .nav a:hover { text-decoration: underline; }
+        header .nav a.export { background: rgba(205,133,63,0.2); border: 1px solid rgba(205,133,63,0.4); padding: 6px 14px; border-radius: 6px; }
 
-        .dashboard { padding: 32px; max-width: 1300px; margin: 0 auto; }
+        .dashboard { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
 
-        /* ── Summary cards ── */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 36px;
-        }
+        /* ── Stats ── */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
         .stat-card {
-            background: rgba(205,133,63,0.1);
-            border: 1px solid rgba(205,133,63,0.3);
-            border-radius: 10px;
-            padding: 20px 24px;
-            text-align: center;
+            background: rgba(205,133,63,0.08); border: 1px solid rgba(205,133,63,0.25);
+            border-radius: 10px; padding: 18px 20px; text-align: center;
         }
-        .stat-card .value {
-            font-size: 42px;
-            font-weight: 700;
-            color: #cd853f;
-            line-height: 1;
+        .stat-card.alert { border-color: rgba(220,80,80,0.4); background: rgba(220,80,80,0.06); }
+        .stat-card .value { font-size: 38px; font-weight: 700; color: #cd853f; line-height: 1; }
+        .stat-card.alert .value { color: #e07070; }
+        .stat-card .label { font-size: 11px; color: rgba(212,169,106,0.55); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card .sublabel { font-size: 12px; color: rgba(212,169,106,0.4); margin-top: 4px; }
+
+        /* ── Level bar chart ── */
+        .panel { background: rgba(205,133,63,0.05); border: 1px solid rgba(205,133,63,0.18); border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; }
+        .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(212,169,106,0.5); margin-bottom: 14px; }
+        .level-bars { display: flex; gap: 4px; align-items: flex-end; height: 70px; }
+        .level-bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; justify-content: flex-end; }
+        .bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; transition: height 0.3s; background: #7a4020; }
+        .bar.stuck { background: #e07070; }
+        .bar-label { font-size: 9px; color: rgba(212,169,106,0.4); }
+        .bar-count { font-size: 10px; color: #d4a96a; font-weight: 600; }
+
+        /* ── Toolbar ── */
+        .toolbar { display: flex; gap: 12px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+        .search-box {
+            flex: 1; min-width: 200px; padding: 8px 14px;
+            background: rgba(205,133,63,0.08); border: 1px solid rgba(205,133,63,0.25);
+            border-radius: 6px; color: #d4a96a; font-size: 14px;
         }
-        .stat-card .label {
-            font-size: 13px;
-            color: rgba(212,169,106,0.6);
-            margin-top: 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .search-box::placeholder { color: rgba(212,169,106,0.35); }
+        .search-box:focus { outline: none; border-color: #cd853f; }
+        .filter-select {
+            padding: 8px 12px; background: rgba(205,133,63,0.08);
+            border: 1px solid rgba(205,133,63,0.25); border-radius: 6px;
+            color: #d4a96a; font-size: 13px;
         }
 
-        /* ── Level distribution bar ── */
-        .section-title {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(212,169,106,0.5);
-            margin-bottom: 12px;
-        }
-        .level-bar-row {
-            background: rgba(205,133,63,0.08);
-            border: 1px solid rgba(205,133,63,0.2);
-            border-radius: 10px;
-            padding: 20px 24px;
-            margin-bottom: 36px;
-        }
-        .level-bars {
-            display: flex;
-            gap: 4px;
-            align-items: flex-end;
-            height: 60px;
-            margin-top: 12px;
-        }
-        .level-bar-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            height: 100%;
-            justify-content: flex-end;
-        }
-        .bar {
-            width: 100%;
-            background: #cd853f;
-            border-radius: 3px 3px 0 0;
-            min-height: 2px;
-            transition: height 0.3s;
-        }
-        .bar-label {
-            font-size: 10px;
-            color: rgba(212,169,106,0.5);
-        }
-        .bar-count {
-            font-size: 11px;
-            color: #cd853f;
-            font-weight: 600;
-        }
-
-        /* ── Players table ── */
-        .table-wrap {
-            background: rgba(205,133,63,0.05);
-            border: 1px solid rgba(205,133,63,0.2);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        thead {
-            background: rgba(107,58,42,0.6);
-        }
+        /* ── Table ── */
+        .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(212,169,106,0.5); margin-bottom: 10px; }
+        .table-wrap { background: rgba(205,133,63,0.04); border: 1px solid rgba(205,133,63,0.18); border-radius: 10px; overflow: hidden; margin-bottom: 32px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead { background: rgba(107,58,42,0.55); }
         thead th {
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(212,169,106,0.7);
-            font-weight: 600;
+            padding: 10px 12px; text-align: left; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 1px; color: rgba(212,169,106,0.65);
+            cursor: pointer; user-select: none; white-space: nowrap;
         }
-        tbody tr {
-            border-top: 1px solid rgba(205,133,63,0.1);
-            transition: background 0.15s;
-        }
-        tbody tr:hover { background: rgba(205,133,63,0.07); }
-        tbody td { padding: 12px 16px; vertical-align: middle; }
+        thead th:hover { color: #cd853f; }
+        thead th.sorted { color: #cd853f; }
+        tbody tr { border-top: 1px solid rgba(205,133,63,0.08); }
+        tbody tr:hover { background: rgba(205,133,63,0.06); }
+        tbody td { padding: 10px 12px; vertical-align: middle; }
 
-        .level-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            background: rgba(205,133,63,0.15);
-            color: #cd853f;
-            border: 1px solid rgba(205,133,63,0.3);
-        }
-        .level-badge.high {
-            background: rgba(80,179,162,0.15);
-            color: #50b3a2;
-            border-color: rgba(80,179,162,0.3);
-        }
-        .level-badge.done {
-            background: rgba(255,215,0,0.15);
-            color: gold;
-            border-color: rgba(255,215,0,0.3);
-        }
+        /* Progress bar */
+        .progress-wrap { width: 90px; height: 7px; background: rgba(205,133,63,0.15); border-radius: 4px; display: inline-block; }
+        .progress-fill { height: 100%; border-radius: 4px; background: #cd853f; }
+        .progress-fill.high { background: #50b3a2; }
+        .progress-fill.done { background: gold; }
+        .progress-text { font-size: 11px; color: rgba(212,169,106,0.5); margin-left: 6px; }
 
-        .room-name { font-size: 12px; color: rgba(212,169,106,0.5); margin-top: 2px; }
-
-        .item-tag {
-            display: inline-block;
-            background: rgba(107,58,42,0.5);
-            border: 1px solid rgba(205,133,63,0.2);
-            border-radius: 4px;
-            padding: 2px 7px;
-            font-size: 11px;
-            color: #d4a96a;
-            margin: 2px 2px 2px 0;
-        }
-        .empty { color: rgba(212,169,106,0.3); font-style: italic; font-size: 12px; }
-
+        .level-badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(205,133,63,0.15); color: #cd853f; border: 1px solid rgba(205,133,63,0.3); }
+        .level-badge.high { background: rgba(80,179,162,0.15); color: #50b3a2; border-color: rgba(80,179,162,0.3); }
+        .level-badge.done { background: rgba(255,215,0,0.15); color: gold; border-color: rgba(255,215,0,0.3); }
+        .room-name { font-size: 11px; color: rgba(212,169,106,0.4); margin-top: 2px; }
+        .item-tag { display: inline-block; background: rgba(107,58,42,0.5); border: 1px solid rgba(205,133,63,0.2); border-radius: 3px; padding: 1px 6px; font-size: 10px; color: #d4a96a; margin: 1px; }
+        .empty { color: rgba(212,169,106,0.3); font-style: italic; font-size: 11px; }
         .score-col { font-weight: 700; color: #fdf0e0; }
-        .email-col { font-size: 12px; color: rgba(212,169,106,0.6); }
+        .email-col { font-size: 11px; color: rgba(212,169,106,0.55); }
+        .time-col { font-size: 11px; color: rgba(212,169,106,0.45); white-space: nowrap; }
+        .no-rows { text-align: center; padding: 40px; color: rgba(212,169,106,0.35); }
 
-        .no-players {
-            text-align: center;
-            padding: 48px;
-            color: rgba(212,169,106,0.4);
-        }
+        /* Action buttons */
+        .btn-action { border: none; border-radius: 4px; padding: 3px 9px; font-size: 10px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; margin: 1px; }
+        .btn-reset { background: rgba(80,179,162,0.18); color: #50b3a2; border: 1px solid rgba(80,179,162,0.35); }
+        .btn-reset:hover { background: rgba(80,179,162,0.3); }
+        .btn-del { background: rgba(220,60,60,0.13); color: #e07070; border: 1px solid rgba(220,60,60,0.3); }
+        .btn-del:hover { background: rgba(220,60,60,0.25); }
+        .btn-send { background: rgba(205,133,63,0.18); color: #cd853f; border: 1px solid rgba(205,133,63,0.35); }
+        .btn-send:hover { background: rgba(205,133,63,0.3); }
+        .msg-dot { display: inline-block; width: 7px; height: 7px; background: #cd853f; border-radius: 50%; margin-left: 4px; vertical-align: middle; }
 
-        .btn-action {
-            border: none;
-            border-radius: 4px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            margin-right: 4px;
-        }
-        .btn-reset {
-            background: rgba(80,179,162,0.2);
-            color: #50b3a2;
-            border: 1px solid rgba(80,179,162,0.4);
-        }
-        .btn-reset:hover { background: rgba(80,179,162,0.35); }
-        .btn-del {
-            background: rgba(220,60,60,0.15);
-            color: #e07070;
-            border: 1px solid rgba(220,60,60,0.35);
-        }
-        .btn-del:hover { background: rgba(220,60,60,0.3); }
+        /* Score form */
+        .score-form { display: inline-flex; gap: 4px; align-items: center; }
+        .score-input { width: 52px; padding: 3px 6px; background: rgba(205,133,63,0.1); border: 1px solid rgba(205,133,63,0.25); border-radius: 4px; color: #d4a96a; font-size: 11px; text-align: center; }
+
+        /* Message form */
+        .msg-row { margin-top: 6px; display: flex; gap: 6px; }
+        .msg-input { flex: 1; padding: 4px 8px; background: rgba(205,133,63,0.08); border: 1px solid rgba(205,133,63,0.25); border-radius: 4px; color: #d4a96a; font-size: 11px; }
+        .msg-input::placeholder { color: rgba(212,169,106,0.35); }
+
+        /* Finished section */
+        .finished-badge { background: rgba(255,215,0,0.12); color: gold; border: 1px solid rgba(255,215,0,0.3); padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>&#9733; Admin Dashboard</h1>
-        <div>
-            <a href="/">&#8592; Back to game</a>
-            &nbsp;&nbsp;
-            <a href="/logout">Logout</a>
+<header>
+    <h1>&#9733; Admin Dashboard</h1>
+    <div class="nav">
+        <a href="/admin/export" class="export">&#8595; Export CSV</a>
+        <a href="/">&#8592; Game</a>
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="dashboard">
+
+    <!-- Summary stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="value">{{ stats.total }}</div>
+            <div class="label">Total players</div>
         </div>
-    </header>
-
-    <div class="dashboard">
-
-        <!-- Summary stats -->
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="value">{{ stats.total }}</div>
-                <div class="label">Total players</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ stats.avg_level }}</div>
-                <div class="label">Average level</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ stats.finished }}</div>
-                <div class="label">Completed game</div>
-            </div>
+        <div class="stat-card">
+            <div class="value">{{ stats.avg_level }}</div>
+            <div class="label">Average level</div>
         </div>
-
-        <!-- Level distribution -->
-        <div class="level-bar-row">
-            <div class="section-title">Players per level</div>
-            <div class="level-bars">
-                {% set max_count = stats.level_counts[1:] | max if stats.level_counts[1:] | max > 0 else 1 %}
-                {% for i in range(1, 21) %}
-                <div class="level-bar-item">
-                    <div class="bar-count">{{ stats.level_counts[i] if stats.level_counts[i] > 0 else '' }}</div>
-                    <div class="bar" style="height: {{ (stats.level_counts[i] / max_count * 50) | int }}px;"></div>
-                    <div class="bar-label">{{ i }}</div>
-                </div>
-                {% endfor %}
-            </div>
+        <div class="stat-card">
+            <div class="value">{{ stats.finished }}</div>
+            <div class="label">Completed game</div>
         </div>
+        <div class="stat-card {% if stats.stuck_level %}alert{% endif %}">
+            <div class="value">{{ stats.stuck_level or '—' }}</div>
+            <div class="label">Most players stuck at</div>
+            {% if stats.stuck_level %}
+            <div class="sublabel">{{ rooms[stats.stuck_level].name }}</div>
+            {% endif %}
+        </div>
+    </div>
 
-        <!-- Players table -->
-        <div class="section-title">All players</div>
-        <div class="table-wrap">
-            {% if players %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Username</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Level</th>
-                        <th>Score</th>
-                        <th>Inventory</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in players %}
-                    <tr>
-                        <td style="color:rgba(212,169,106,0.4)">{{ loop.index }}</td>
-                        <td><strong>{{ p.username }}</strong></td>
-                        <td>{{ p.name }}</td>
-                        <td class="email-col">{{ p.email }}</td>
-                        <td>
-                            {% if p.level == 20 %}
-                                <span class="level-badge done">Level 20</span>
-                            {% elif p.level >= 15 %}
-                                <span class="level-badge high">Level {{ p.level }}</span>
-                            {% else %}
-                                <span class="level-badge">Level {{ p.level }}</span>
-                            {% endif %}
-                            <div class="room-name">{{ p.room_name }}</div>
-                        </td>
-                        <td class="score-col">{{ p.score }}</td>
-                        <td>
-                            {% if p.inventory %}
-                                {% for item in p.inventory %}
-                                    <span class="item-tag">{{ item }}</span>
-                                {% endfor %}
-                            {% else %}
-                                <span class="empty">empty</span>
-                            {% endif %}
-                        </td>
-                        <td style="white-space:nowrap;">
+    <!-- Level distribution -->
+    <div class="panel">
+        <div class="panel-title">Players per level</div>
+        <div class="level-bars">
+            {% set max_count = stats.level_counts[1:] | max if stats.level_counts[1:] | max > 0 else 1 %}
+            {% for i in range(1, 21) %}
+            <div class="level-bar-item">
+                <div class="bar-count">{{ stats.level_counts[i] if stats.level_counts[i] > 0 else '' }}</div>
+                <div class="bar {% if i == stats.stuck_level %}stuck{% endif %}"
+                     style="height:{{ (stats.level_counts[i] / max_count * 55) | int }}px;"></div>
+                <div class="bar-label">{{ i }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <input class="search-box" type="text" id="searchBox" placeholder="Search by username or name…" oninput="filterTable()">
+        <select class="filter-select" id="levelFilter" onchange="filterTable()">
+            <option value="">All levels</option>
+            {% for i in range(1, 20) %}
+            <option value="{{ i }}">Level {{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Active players -->
+    <div class="section-title">Active players ({{ players | length }})</div>
+    <div class="table-wrap">
+        {% if players %}
+        <table id="playerTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">#</th>
+                    <th onclick="sortTable(1)">Username</th>
+                    <th onclick="sortTable(2)">Name</th>
+                    <th>Email</th>
+                    <th onclick="sortTable(4)">Level &#8597;</th>
+                    <th onclick="sortTable(5)">Score &#8597;</th>
+                    <th>Progress</th>
+                    <th>Inventory</th>
+                    <th onclick="sortTable(8)">Last seen</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in players %}
+                <tr data-level="{{ p.level }}" data-name="{{ p.name | lower }}" data-username="{{ p.username | lower }}">
+                    <td style="color:rgba(212,169,106,0.35)">{{ loop.index }}</td>
+                    <td><strong>{{ p.username }}</strong>{% if p.has_message %}<span class="msg-dot" title="Pending message"></span>{% endif %}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="email-col">{{ p.email }}</td>
+                    <td>
+                        {% if p.level >= 15 %}
+                            <span class="level-badge high">{{ p.level }}</span>
+                        {% else %}
+                            <span class="level-badge">{{ p.level }}</span>
+                        {% endif %}
+                        <div class="room-name">{{ p.room_name }}</div>
+                    </td>
+                    <td class="score-col">{{ p.score }}</td>
+                    <td>
+                        <div class="progress-wrap">
+                            <div class="progress-fill {% if p.level >= 15 %}high{% endif %}"
+                                 style="width:{{ ((p.level - 1) / 19 * 100) | int }}%"></div>
+                        </div>
+                        <span class="progress-text">{{ p.level }}/20</span>
+                    </td>
+                    <td>
+                        {% if p.inventory %}
+                            {% for item in p.inventory %}<span class="item-tag">{{ item }}</span>{% endfor %}
+                        {% else %}
+                            <span class="empty">empty</span>
+                        {% endif %}
+                    </td>
+                    <td class="time-col">{{ p.last_login }}</td>
+                    <td style="min-width:200px;">
+                        <!-- Score -->
+                        <form method="POST" action="/admin/score/{{ p.username }}" class="score-form">
+                            <input class="score-input" type="number" name="amount" placeholder="±pts" required>
+                            <button type="submit" class="btn-action btn-send">+Score</button>
+                        </form>
+                        <!-- Message -->
+                        <div class="msg-row">
+                            <form method="POST" action="/admin/message/{{ p.username }}" style="display:flex;gap:4px;flex:1;">
+                                <input class="msg-input" type="text" name="message" placeholder="Send message…">
+                                <button type="submit" class="btn-action btn-send">&#128276;</button>
+                            </form>
+                        </div>
+                        <!-- Reset / Delete -->
+                        <div style="margin-top:5px;">
                             <form method="POST" action="/admin/reset/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Reset {{ p.username }} to level 1?')">
                                 <button type="submit" class="btn-action btn-reset">RESET</button>
                             </form>
-                            <form method="POST" action="/admin/delete/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Delete {{ p.username }}? This cannot be undone.')">
+                            <form method="POST" action="/admin/delete/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Delete {{ p.username }}?')">
                                 <button type="submit" class="btn-action btn-del">DEL</button>
                             </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <div class="no-players">No players registered yet.</div>
-            {% endif %}
-        </div>
-
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-rows">No active players.</div>
+        {% endif %}
     </div>
+
+    <!-- Finished players -->
+    {% if finished %}
+    <div class="section-title">Completed game ({{ finished | length }})</div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th><th>Username</th><th>Name</th><th>Email</th>
+                    <th>Final score</th><th>Last seen</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in finished %}
+                <tr>
+                    <td style="color:rgba(212,169,106,0.35)">{{ loop.index }}</td>
+                    <td><strong>{{ p.username }}</strong> <span class="finished-badge">&#10003; Done</span></td>
+                    <td>{{ p.name }}</td>
+                    <td class="email-col">{{ p.email }}</td>
+                    <td class="score-col" style="color:gold">{{ p.score }}</td>
+                    <td class="time-col">{{ p.last_login }}</td>
+                    <td>
+                        <form method="POST" action="/admin/reset/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Reset {{ p.username }}?')">
+                            <button type="submit" class="btn-action btn-reset">RESET</button>
+                        </form>
+                        <form method="POST" action="/admin/delete/{{ p.username }}" style="display:inline;" onsubmit="return confirm('Delete {{ p.username }}?')">
+                            <button type="submit" class="btn-action btn-del">DEL</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    // ── Search + level filter ──
+    function filterTable() {
+        var query = document.getElementById('searchBox').value.toLowerCase();
+        var level = document.getElementById('levelFilter').value;
+        document.querySelectorAll('#playerTable tbody tr').forEach(function(row) {
+            var name     = row.dataset.name || '';
+            var username = row.dataset.username || '';
+            var rowLevel = row.dataset.level || '';
+            var matchSearch = !query || name.includes(query) || username.includes(query);
+            var matchLevel  = !level  || rowLevel === level;
+            row.style.display = (matchSearch && matchLevel) ? '' : 'none';
+        });
+    }
+
+    // ── Column sort ──
+    var sortDir = {};
+    function sortTable(col) {
+        var table = document.getElementById('playerTable');
+        var rows  = Array.from(table.querySelectorAll('tbody tr'));
+        sortDir[col] = !sortDir[col];
+        rows.sort(function(a, b) {
+            var aVal = a.cells[col] ? a.cells[col].innerText.trim() : '';
+            var bVal = b.cells[col] ? b.cells[col].innerText.trim() : '';
+            var aNum = parseFloat(aVal), bNum = parseFloat(bVal);
+            if (!isNaN(aNum) && !isNaN(bNum)) return sortDir[col] ? aNum - bNum : bNum - aNum;
+            return sortDir[col] ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+        var tbody = table.querySelector('tbody');
+        rows.forEach(function(r) { tbody.appendChild(r); });
+        document.querySelectorAll('thead th').forEach(function(th) { th.classList.remove('sorted'); });
+        table.querySelectorAll('thead th')[col].classList.add('sorted');
+    }
+</script>
 </body>
 </html>

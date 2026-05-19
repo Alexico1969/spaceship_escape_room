@@ -283,6 +283,31 @@ footer {
 }
 
 
+/* Admin message banner */
+#admin-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #8b4513;
+    color: #fdf0e0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    z-index: 1000;
+    border-bottom: 2px solid #cd853f;
+}
+#admin-banner button {
+    background: none;
+    border: none;
+    color: #fdf0e0;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
 /* =============================================
    Login page
    ============================================= */

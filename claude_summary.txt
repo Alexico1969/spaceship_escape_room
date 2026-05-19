@@ -1,0 +1,216 @@
+SPACESHIP ESCAPE ROOM — PROJECT SUMMARY FOR CLAUDE
+=====================================================
+Last updated: 2026-05-18
+GitHub: https://github.com/Alexico1969/spaceship_escape_room
+Deployed: https://spaceescape.pythonanywhere.com/
+Developer email: alexicoo@gmail.com
+
+
+OVERVIEW
+--------
+A Flask-based text-adventure escape room game with 20 levels.
+Players type commands to explore rooms, solve puzzles and escape Lyra Station.
+Built for use in a classroom setting (Molloy HS). Teacher: avanwinkel@molloyhs.org.
+Players who complete all 20 levels receive a unique code to email the teacher.
+
+
+TECH STACK
+----------
+- Python / Flask
+- Flask-Session (filesystem sessions)
+- SQLite (database.db) — single 'users' table
+- Werkzeug password hashing
+- python-dotenv for SECRET_KEY
+- Jinja2 templates
+- Vanilla CSS + JS (no frameworks)
+- Managed via Pipenv (Pipfile) + requirements.txt
+
+
+FILE STRUCTURE
+--------------
+flask_app.py       — routes, session management, override commands
+process.py         — command parser (all game logic lives here)
+database.py        — SQLite helpers, Room class, init_rooms() (all 20 rooms)
+static/style.css   — all CSS including login page styles
+templates/
+  layout.html      — base template (header)
+  home.html        — main game view (grid layout)
+  login.html       — standalone login page (does NOT extend layout.html)
+  register.html    — standalone register page
+  next_level.html  — level transition page
+  win.html         — win screen (unused — game ends at level 20 with video)
+  admin.html       — admin dashboard
+  dump.html        — legacy raw dump (kept but replaced by /admin)
+static/rooms/      — room background images (room_01.png … room_19.png)
+static/computers/  — old computer screen images (legacy, not used in new game)
+static/Spaceship_Escape_Room_Intro_v1.mp4  — intro video (NOT in git, >100MB)
+static/rooms/finale.mp4                   — level 20 escape video (NOT in git)
+solutions.txt      — full solutions for all 20 levels
+.env               — SECRET_KEY (NOT in git)
+database.db        — SQLite database (NOT in git)
+
+
+DATABASE
+--------
+Single table: users
+  name TEXT, email TEXT, username TEXT, password TEXT (hashed),
+  level INTEGER, score INTEGER, inventory TEXT (comma-separated)
+
+Admin user: username='admin' — grants access to /admin dashboard.
+
+
+SESSION VARIABLES
+-----------------
+user, level, score, inventory (list), objects (dict), door_status,
+room_type, sequence_step, wrong_attempts, log_slid, key_on_log,
+key_lost, end_code, new (bool — controls intro video display)
+
+
+ROUTES
+------
+GET/POST /           — main game loop
+GET/POST /next_level — level transition (hidden field prevents back-button skip)
+GET      /win        — win screen (legacy, not used)
+GET      /admin      — admin dashboard (admin only)
+POST     /admin/delete/<username>
+POST     /admin/reset/<username>
+GET/POST /login, /register, /logout
+GET      /dump1      — legacy raw dump (admin only)
+
+
+ROOM TYPES (in database.py Room class)
+---------------------------------------
+code        — enter a numeric or text code
+riddle      — answer a free-text riddle
+inventory   — use a specific item from inventory
+combo       — combine two items → new item → use result
+sequence    — type commands in correct order (e.g. switch a, switch c)
+retrieval   — multi-step physical puzzle (level 19 key-under-door)
+pod         — (legacy, replaced by retrieval in level 19)
+end_sequence — final room: plays video, shows completion code
+end         — (legacy)
+
+
+ROOM CLASS FIELDS
+-----------------
+level, name, description, type, furniture (comma str), objects (dict),
+expected_output, required_item, required_item_alt (list of alternatives),
+combo_items (list), combo_result, sequence (list of commands),
+must_take (list — items required before exit), combo_key (e.g. "13"),
+combo_wrong_key_msg, take_requirements (dict item→required),
+use_effect ("unlock" or "reveal"), use_reveal_updates (dict),
+use_reveal_message, max_attempts (0=no lockout), door_look_msg
+
+
+OBJECTS DICT CONVENTION
+------------------------
+"key": "value"          → takeable item
+"key": "<description>"  → untakeable, observable only
+"key": ""               → slot is empty (item was taken)
+
+
+PROCESS.PY COMMAND FLOW (in order)
+------------------------------------
+1. exit / leave / open door  — checks door_status, must_take, required_item
+2. help
+3. read <x>              → redirected to "look at <x>"
+4. look / look around
+5. look at / examine / look <thing>  — searches objects keys then values then inventory
+6. take / get / pick up  — checks take_requirements before allowing
+7. RETRIEVAL handler      — level 19 multi-step puzzle (log_slid, key_on_log, key_lost)
+8. open <thing>           — door goes to exit handler; other objects open normally
+9. combine / natural language combo detection
+10. use / insert / place / put / slot / apply / install / fix / repair / attach / connect / fit
+11. sequence rooms
+12. pod rooms (legacy)
+13. end_sequence room
+14. code / riddle / inventory type answer check (with optional max_attempts lockout)
+15. flavour responses (hit, break, run, etc.)
+
+
+OVERRIDE COMMANDS (tester only)
+---------------------------------
+**back          — go to previous level (resets room state)
+**remove <item> — remove item from inventory
+(Note: **forward was intentionally REMOVED — players cannot skip ahead)
+
+
+INTRO / FINALE VIDEO
+---------------------
+Intro: static/Spaceship_Escape_Room_Intro_v1.mp4
+  - Shows on first login (session['new'] = True)
+  - Has X button to close (pauses + hides)
+  - Submit button hidden until video ends or X is clicked
+  - Set to 70% of screen width via .vid CSS class
+
+Finale: static/rooms/finale.mp4
+  - Plays on level 20
+  - Code revealed after video ends
+  - Code format: USERNAME-DDMM-HHMM-XX (XX = random 2 digits)
+  - Stored in session['end_code'], generated once per login
+
+
+END CODE
+--------
+Generated in flask_app.py home route when level == 20.
+Format: {username[:6].upper()}-{DDMM}-{HHMM}-{random 2 digits}
+Stored in session so it doesn't change on page refresh.
+Reset on login (session.pop('end_code', None)).
+
+
+LEVEL SOLUTIONS (brief)
+------------------------
+01 Crew Quarters      code       742
+02 Storage Corridor   inventory  use magnetic keycard
+03 Airlock            riddle     light
+04 Maintenance Bay    code       3141  (also take wrench)
+05 Coolant Control    combo      combine wrench + pipe section → fitted pipe
+06 Power Relay        sequence   switch a, switch c
+07 Hydroponics Lab    code       6187  (C=6,H=1,O=8,N=7)
+08 Comms Array        riddle     nova  (Neptune,O-sign,Venus,Antares)
+09 Captain's Quarters combo      cipher wheel 13 on log → decoded log
+10 Security Office    riddle     zara
+11 Reactor Anteroom   code       314213  (reversed sequence)
+12 Reactor Core       combo      gloves→take rod, combine rod+sleeve→use
+13 Life Support       riddle     map
+14 Navigation Bay     code       84921  (stars: 8,4,9 + Σ=21)
+15 Cargo Hold         code       443  (HZM cargo: 165+278)
+16 Fuel Bay           code       u  (Fibonacci in letters, lockout after 5)
+17 Escape Pod Prep    code       689  (heaviest first, pack×position)
+                                 fix locker first (fitted pipe/wrench/multi-tool)
+18 Systems Override   combo      combine launch key + access card → authorized key
+19 Escape Pod Bay     retrieval  slide log under door, push pencil, pull log, use metal key
+20 Escape             end_seq    watch video, email code to avanwinkel@molloyhs.org
+
+
+KNOWN QUIRKS / DECISIONS
+--------------------------
+- Passwords are hashed (werkzeug). Existing plaintext passwords won't work after migration.
+- session['objects'] is set on login/level-up from rooms[level].objects.
+  If room data changes while a player is mid-level, they need **back + re-enter to reload.
+- Article stripping (' the ', ' a ', ' an ') happens BEFORE most handlers.
+  original_inp is preserved before stripping (needed for switch 'a' in level 6).
+- "cypher" is normalised to "cipher" at top of process().
+- use_verbs tuple: use, insert, place, put, slot, apply, install, fix, repair, attach, connect, fit
+- The 'decoded log' (room 9) stays in inventory after use — needed for level 19 retrieval puzzle.
+- Level 17 requires fitted pipe, wrench, OR multi-tool (required_item_alt list).
+- Level 16 has max_attempts=5 lockout — only room with this feature.
+- Back-button double-submit on /next_level prevented via hidden 'current_level' field.
+- Video buttons all have type="button" to prevent accidental form submission.
+- *.mp4 and .env and database.db are in .gitignore (not in GitHub repo).
+- Admin route is /admin (not /dump1 which is legacy).
+- The win.html page exists but is not used — level 20 is end_sequence, not a win redirect.
+
+
+COLOR SCHEME (brown palette)
+------------------------------
+Header / main accent : #8b4513 (saddle brown)
+Grid items           : #7a4020
+Level bar            : #c8864a
+Inventory / topright : #d4a96a
+Main game area       : #1a0e07
+Command bars         : #3d2010
+Submit button        : #cd853f
+Login background     : #120a04
+Login button hover   : #a0522d
+Message box          : #fdf0e0 (parchment)

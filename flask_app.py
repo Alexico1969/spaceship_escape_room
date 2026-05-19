@@ -67,6 +67,18 @@ def home():
     rtype = session.get('room_type', room_data.type)
     msg = room_data.description
 
+    # Check for admin message and pop it (show once)
+    admin_msg = None
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT admin_message FROM users WHERE username=?", (username,))
+    row_msg = c.fetchone()
+    if row_msg and row_msg[0]:
+        admin_msg = row_msg[0]
+        conn.execute("UPDATE users SET admin_message=NULL WHERE username=?", (username,))
+        conn.commit()
+    conn.close()
+
     # Generate a unique end code once when the player reaches level 20
     if level == 20 and 'end_code' not in session:
         now = datetime.now()
@@ -97,7 +109,7 @@ def home():
         'home.html',
         msg=msg, inventory=inventory, user_level=level,
         room_data=room_data, username=username, rtype=rtype, score=score,
-        end_code=end_code
+        end_code=end_code, admin_msg=admin_msg
     )
 
 
@@ -175,6 +187,12 @@ def login():
             level = row[4]
             score = row[5]
             inventory = row[6].split(",") if row[6] else []
+            # Record login timestamp
+            conn = sqlite3.connect('database.db')
+            conn.execute("UPDATE users SET last_login=? WHERE username=?",
+                         (datetime.now().strftime('%Y-%m-%d %H:%M'), username))
+            conn.commit()
+            conn.close()
             session['user'] = username
             session['level'] = level
             session['score'] = score
@@ -208,34 +226,86 @@ def admin():
         return redirect(url_for('home'))
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute("SELECT name, email, username, level, score, inventory FROM users WHERE username != 'admin' ORDER BY level DESC, score DESC")
+    c.execute("SELECT name, email, username, level, score, inventory, last_login, admin_message FROM users WHERE username != 'admin' ORDER BY level DESC, score DESC")
     rows = c.fetchall()
     conn.close()
 
     players = []
     level_counts = [0] * 21
     for row in rows:
-        name, email, username, level, score, inventory = row
+        name, email, username, level, score, inventory, last_login, admin_message = row
         items = [i for i in inventory.split(',') if i] if inventory else []
         players.append({
-            'name':      name,
-            'email':     email,
-            'username':  username,
-            'level':     level,
-            'room_name': rooms[level].name if level <= 20 else 'Done',
-            'score':     score,
-            'inventory': items,
+            'name':          name,
+            'email':         email,
+            'username':      username,
+            'level':         level,
+            'room_name':     rooms[level].name if level <= 20 else 'Done',
+            'score':         score,
+            'inventory':     items,
+            'last_login':    last_login or '—',
+            'has_message':   bool(admin_message),
         })
         if level <= 20:
             level_counts[level] += 1
 
+    # Stuck level = level with most players (excluding 1 and 20)
+    mid_counts = level_counts[2:20]
+    stuck_level = mid_counts.index(max(mid_counts)) + 2 if any(mid_counts) else None
+
     stats = {
-        'total':     len(players),
-        'avg_level': round(sum(p['level'] for p in players) / len(players), 1) if players else 0,
-        'finished':  sum(1 for p in players if p['level'] == 20),
+        'total':        len(players),
+        'avg_level':    round(sum(p['level'] for p in players) / len(players), 1) if players else 0,
+        'finished':     sum(1 for p in players if p['level'] == 20),
         'level_counts': level_counts,
+        'stuck_level':  stuck_level,
     }
-    return render_template('admin.html', players=players, stats=stats, rooms=rooms)
+    finished = [p for p in players if p['level'] == 20]
+    active   = [p for p in players if p['level'] < 20]
+    return render_template('admin.html', players=active, finished=finished, stats=stats, rooms=rooms)
+
+
+@app.route('/admin/export')
+def admin_export():
+    if 'user' not in session or session['user'] != 'admin':
+        return redirect(url_for('home'))
+    import csv, io
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT name, email, username, level, score, inventory, last_login FROM users WHERE username != 'admin' ORDER BY level DESC")
+    rows = c.fetchall()
+    conn.close()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Name', 'Email', 'Username', 'Level', 'Score', 'Inventory', 'Last Login'])
+    writer.writerows(rows)
+    from flask import Response
+    return Response(output.getvalue(), mimetype='text/csv',
+                    headers={'Content-Disposition': 'attachment; filename=players.csv'})
+
+
+@app.route('/admin/score/<username>', methods=['POST'])
+def admin_score(username):
+    if 'user' not in session or session['user'] != 'admin':
+        return redirect(url_for('home'))
+    amount = int(request.form.get('amount', 0))
+    conn = sqlite3.connect('database.db')
+    conn.execute("UPDATE users SET score = score + ? WHERE username=?", (amount, username))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/message/<username>', methods=['POST'])
+def admin_message(username):
+    if 'user' not in session or session['user'] != 'admin':
+        return redirect(url_for('home'))
+    msg = request.form.get('message', '').strip()
+    conn = sqlite3.connect('database.db')
+    conn.execute("UPDATE users SET admin_message=? WHERE username=?", (msg or None, username))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
 
 
 @app.route('/admin/delete/<username>', methods=['POST'])

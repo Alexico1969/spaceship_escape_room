@@ -12,6 +12,14 @@ def connector():
         '(name TEXT, email TEXT, username TEXT, password TEXT, '
         'level INTEGER, score INTEGER, inventory TEXT)'
     )
+    # Add new columns gracefully (ignored if they already exist)
+    for col in ("ALTER TABLE users ADD COLUMN last_login TEXT",
+                "ALTER TABLE users ADD COLUMN admin_message TEXT"):
+        try:
+            conn.execute(col)
+        except Exception:
+            pass
+    conn.commit()
     conn.close()
 
 def check_login(username, password):
