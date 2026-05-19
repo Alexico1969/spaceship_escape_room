@@ -45,7 +45,7 @@ def register_user(name, email, username, password, level, score, inventory):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute(
-        "INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (name, email, username, password, level, score, inventory) VALUES (?, ?, ?, ?, ?, ?, ?)",
         (name, email, username, hashed, level, score, inventory)
     )
     conn.commit()
