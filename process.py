@@ -130,6 +130,8 @@ def process(inp, inventory, room_data, level, objects):
                     if not val:
                         return f"There is nothing notable about the {key}."
                     detail = val.replace("<", "").replace(">", "")
+                    if detail.startswith(">>"):
+                        return detail[2:].strip()
                     return f"You look at the {key}: {detail}."
 
             for key, val in objects.items():
@@ -140,6 +142,8 @@ def process(inp, inventory, room_data, level, objects):
                     continue
                 if thing_key in clean or clean in thing_key:
                     item_name = val.replace("<", "").replace(">", "").strip()
+                    if item_name.startswith(">>"):
+                        return item_name[2:].strip()
                     desc = ITEM_DESCRIPTIONS.get(item_name.lower())
                     if desc:
                         return f"You look at the {item_name}: {desc}"

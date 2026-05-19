@@ -192,7 +192,7 @@ def init_rooms():
         ),
         furniture="gauges,toolbox,note,door,keypad",
         objects={
-            "gauges":  "<four pressure gauges mounted in a row — check the image for their readings>",
+            "gauges":  "<>>You can actually read out the gauges yourself!>",
             "toolbox": "wrench",
             "note":    "<override code = gauge readings left to right>",
             "door":    "<sealed door>",
